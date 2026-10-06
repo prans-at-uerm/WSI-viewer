@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIL WSI Clinical Viewer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="diagnosis">
+      <span class="label">Diagnosis</span>
+      <span id="diagnosisText">Glioblastoma</span>
+    </div>
+    <div class="study-title">Histopathology Review</div>
+  </header>
+
+  <main class="app">
+    <section class="viewer-area">
+      <div class="viewer-header">
+        <div>
+          <h1 id="slideTitle">Slide 1</h1>
+          <p>Compare the original whole-slide image with the model-identified regions.</p>
+        </div>
+        <div class="zoom-readout" id="zoomReadout">100%</div>
+      </div>
+
+      <div class="viewer-grid">
+        <div class="panel">
+          <div class="panel-title">Plain WSI</div>
+          <div class="viewport" id="plainViewport" aria-label="Plain whole-slide image viewer">
+            <img id="plainImage" src="slides/slide1/wsi.svg" alt="Plain whole-slide image" draggable="false" />
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title heat-title">
+            WSI + Heatmap
+            <span class="heat-legend"><i></i> Model attention</span>
+          </div>
+          <div class="viewport" id="heatViewport" aria-label="Whole-slide image with heatmap viewer">
+            <img id="heatImage" src="slides/slide1/heatmap.svg" alt="Whole-slide image with heatmap" draggable="false" />
+          </div>
+        </div>
+      </div>
+
+      <div class="viewer-controls">
+        <span>Scroll to zoom · Drag to pan · Both views stay synchronized</span>
+        <button id="resetBtn" type="button">Reset view</button>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <h2>Slides</h2>
+      <p class="sidebar-note">Select a whole-slide image for review.</p>
+      <div id="slideList" class="slide-list"></div>
+
+      <div class="info-card">
+        <div class="info-label">Current slide</div>
+        <div id="currentSlide">Slide 1</div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
