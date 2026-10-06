@@ -63,17 +63,23 @@ function resetView() {
 
 function zoomAt(clientX, clientY, factor) {
   const rect = plainViewport.getBoundingClientRect();
-  const mouseX = clientX - rect.left;
-  const mouseY = clientY - rect.top;
+
+  // Mouse position relative to the center of the viewport
+  const mouseX = clientX - rect.left - rect.width / 2;
+  const mouseY = clientY - rect.top - rect.height / 2;
 
   const oldScale = scale;
-  const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  const newScale = Math.min(
+    MAX_SCALE,
+    Math.max(MIN_SCALE, scale * factor)
+  );
 
   if (newScale === oldScale) return;
 
-  // Keep the point under the cursor fixed while zooming.
+  // Keep the point under the cursor fixed while zooming
   x = mouseX - (mouseX - x) * (newScale / oldScale);
   y = mouseY - (mouseY - y) * (newScale / oldScale);
+
   scale = newScale;
 
   applyTransform();
