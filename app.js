@@ -114,8 +114,8 @@ function addViewerEvents(viewport) {
 function loadSlide(slide) {
   // Prototype: all six buttons currently use slide1.
   // Later, simply change slide.folder to slide2, slide3, etc.
-  plainImage.src = `slides/${slide.folder}/wsi.svg`;
-  heatImage.src = `slides/${slide.folder}/heatmap.svg`;
+  plainImage.src = "dummy_wsi.jpg";
+  heatImage.src = "dummy_heatmap.jpg";
 
   slideTitle.textContent = slide.label;
   currentSlide.textContent = slide.label;
