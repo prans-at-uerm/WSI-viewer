@@ -29,9 +29,25 @@ const MAX_SCALE = 8;
 const ZOOM_FACTOR = 1.15;
 
 function applyTransform() {
+  const viewportWidth = plainViewport.clientWidth;
+  const viewportHeight = plainViewport.clientHeight;
+
+  const imageWidth = plainImage.offsetWidth * scale;
+  const imageHeight = plainImage.offsetHeight * scale;
+
+  // Maximum amount the image can move while keeping it inside the viewport
+  const maxX = Math.max(0, (imageWidth - viewportWidth) / 2);
+  const maxY = Math.max(0, (imageHeight - viewportHeight) / 2);
+
+  // Prevent dragging the image completely outside the viewport
+  x = Math.min(maxX, Math.max(-maxX, x));
+  y = Math.min(maxY, Math.max(-maxY, y));
+
   const transform = `translate(${x}px, ${y}px) scale(${scale})`;
+
   plainImage.style.transform = transform;
   heatImage.style.transform = transform;
+
   zoomReadout.textContent = `${Math.round(scale * 100)}%`;
 }
 
