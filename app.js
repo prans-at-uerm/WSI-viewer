@@ -24,6 +24,9 @@ let activePointer = null;
 let lastPointerX = 0;
 let lastPointerY = 0;
 
+const activePointers = new Map();
+let lastPinchDistance = null;
+
 const MIN_SCALE = 1;
 const MAX_SCALE = 8;
 const ZOOM_FACTOR = 1.15;
@@ -79,18 +82,64 @@ function zoomAt(clientX, clientY, factor) {
 function pointerDown(event) {
   if (event.pointerType === "mouse" && event.button !== 0) return;
 
-  activePointer = event.pointerId;
-  lastPointerX = event.clientX;
-  lastPointerY = event.clientY;
+  activePointers.set(event.pointerId, {
+    x: event.clientX,
+    y: event.clientY
+  });
 
-  plainViewport.setPointerCapture(event.pointerId);
-  heatViewport.setPointerCapture(event.pointerId);
+  if (activePointers.size === 1) {
+    activePointer = event.pointerId;
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
 
-  plainViewport.classList.add("dragging");
-  heatViewport.classList.add("dragging");
+    plainViewport.setPointerCapture(event.pointerId);
+    heatViewport.setPointerCapture(event.pointerId);
+
+    plainViewport.classList.add("dragging");
+    heatViewport.classList.add("dragging");
+  }
+
+  if (activePointers.size === 2) {
+    const points = [...activePointers.values()];
+
+    const dx = points[0].x - points[1].x;
+    const dy = points[0].y - points[1].y;
+
+    lastPinchDistance = Math.hypot(dx, dy);
+  }
 }
 
 function pointerMove(event) {
+  if (!activePointers.has(event.pointerId)) return;
+
+  activePointers.set(event.pointerId, {
+    x: event.clientX,
+    y: event.clientY
+  });
+
+  // Pinch-to-zoom
+  if (activePointers.size === 2) {
+    const points = [...activePointers.values()];
+
+    const dx = points[0].x - points[1].x;
+    const dy = points[0].y - points[1].y;
+
+    const distance = Math.hypot(dx, dy);
+
+    if (lastPinchDistance !== null) {
+      const factor = distance / lastPinchDistance;
+
+      const centerX = (points[0].x + points[1].x) / 2;
+      const centerY = (points[0].y + points[1].y) / 2;
+
+      zoomAt(centerX, centerY, factor);
+    }
+
+    lastPinchDistance = distance;
+    return;
+  }
+
+  // Normal one-finger / mouse dragging
   if (activePointer !== event.pointerId) return;
 
   const dx = event.clientX - lastPointerX;
@@ -106,11 +155,20 @@ function pointerMove(event) {
 }
 
 function pointerUp(event) {
-  if (activePointer !== event.pointerId) return;
+  activePointers.delete(event.pointerId);
 
-  activePointer = null;
-  plainViewport.classList.remove("dragging");
-  heatViewport.classList.remove("dragging");
+  if (activePointers.size < 2) {
+    lastPinchDistance = null;
+  }
+
+  if (event.pointerId === activePointer) {
+    activePointer = null;
+  }
+
+  if (activePointers.size === 0) {
+    plainViewport.classList.remove("dragging");
+    heatViewport.classList.remove("dragging");
+  }
 }
 
 function addViewerEvents(viewport) {
